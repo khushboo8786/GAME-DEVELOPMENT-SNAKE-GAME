@@ -1,0 +1,136 @@
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <vector>
+#include <ctime>
+#include <cstdlib>
+
+using namespace sf;
+
+const int cellSize = 20;
+const int width = 30;
+const int height = 20;
+
+Vector2i direction(1, 0);  // Right
+float delay = 0.1f;
+
+struct SnakePart {
+    int x, y;
+    SnakePart(int x, int y) : x(x), y(y) {}
+};
+
+class Game {
+    RenderWindow window;
+    Texture tSnake, tFood;
+    Sprite sSnake, sFood;
+    std::vector<SnakePart> snake;
+    Vector2i food;
+    Clock clock;
+    SoundBuffer eatBuffer, gameOverBuffer;
+    Sound eatSound, gameOverSound;
+    float timer = 0;
+    bool gameOver = false;
+
+public:
+    Game() : window(VideoMode(cellSize * width, cellSize * height), "Snake Game") {
+        tSnake.loadFromFile("snake.png");
+        tFood.loadFromFile("food.png");
+        eatBuffer.loadFromFile("eat.wav");
+        gameOverBuffer.loadFromFile("gameover.wav");
+
+        sSnake.setTexture(tSnake);
+        sFood.setTexture(tFood);
+        eatSound.setBuffer(eatBuffer);
+        gameOverSound.setBuffer(gameOverBuffer);
+
+        snake.emplace_back(width / 2, height / 2);
+        srand(time(0));
+        spawnFood();
+    }
+
+    void spawnFood() {
+        food.x = rand() % width;
+        food.y = rand() % height;
+    }
+
+    void handleInput() {
+        if (Keyboard::isKeyPressed(Keyboard::Up) && direction.y != 1) direction = {0, -1};
+        if (Keyboard::isKeyPressed(Keyboard::Down) && direction.y != -1) direction = {0, 1};
+        if (Keyboard::isKeyPressed(Keyboard::Left) && direction.x != 1) direction = {-1, 0};
+        if (Keyboard::isKeyPressed(Keyboard::Right) && direction.x != -1) direction = {1, 0};
+    }
+
+    void update() {
+        float time = clock.getElapsedTime().asSeconds();
+        clock.restart();
+        timer += time;
+
+        if (timer >= delay) {
+            timer = 0;
+
+            // Move snake
+            for (int i = snake.size() - 1; i > 0; --i)
+                snake[i] = snake[i - 1];
+
+            snake[0].x += direction.x;
+            snake[0].y += direction.y;
+
+            // Check wall collision
+            if (snake[0].x < 0 || snake[0].x >= width || snake[0].y < 0 || snake[0].y >= height)
+                gameOver = true;
+
+            // Check self collision
+            for (int i = 1; i < snake.size(); ++i)
+                if (snake[0].x == snake[i].x && snake[0].y == snake[i].y)
+                    gameOver = true;
+
+            // Food eaten
+            if (snake[0].x == food.x && snake[0].y == food.y) {
+                snake.push_back(snake.back());
+                eatSound.play();
+                spawnFood();
+                delay *= 0.95f; // Increase difficulty
+            }
+        }
+    }
+
+    void draw() {
+        window.clear(Color::Black);
+
+        for (auto& part : snake) {
+            sSnake.setPosition(part.x * cellSize, part.y * cellSize);
+            window.draw(sSnake);
+        }
+
+        sFood.setPosition(food.x * cellSize, food.y * cellSize);
+        window.draw(sFood);
+
+        window.display();
+    }
+
+    void run() {
+        while (window.isOpen()) {
+            Event e;
+            while (window.pollEvent(e))
+                if (e.type == Event::Closed)
+                    window.close();
+
+            if (!gameOver) {
+                handleInput();
+                update();
+                draw();
+            } else {
+                gameOverSound.play();
+                window.close();
+            }
+        }
+    }
+};
+
+int main() {
+    Game game;
+    game.run();
+    return 0;
+}
+
+   
+
