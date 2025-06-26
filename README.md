@@ -12,101 +12,39 @@
 
 *MENTOR*:NEELA SANTHOSH KUMAR
 
-**Game development is one of the most exciting and creative areas in software programming. Among the many classic games, the Snake Game stands out as a timeless and beginner-friendly project. Originally made popular on old Nokia mobile phones, the Snake Game has since become a classic example for learning graphics programming, input handling, and game logic. Developing the Snake Game introduces you to the fundamentals of how interactive applications work in real-time, making it an excellent learning project for aspiring game developers.
+**This project is a 2D Snake Game developed in C++ using the SFML (Simple and Fast Multimedia Library). The main objective of this implementation was to gain practical experience in working with multimedia libraries, real-time rendering, input handling, sound integration, and game logic structuring using object-oriented programming. The game is interactive, responsive, and features both visual and audio elements to deliver a complete gaming experience.
 
-The Snake Game is a simple arcade game where the player controls a snake that moves around the screen. The objective is to eat food items that appear randomly on the screen. Each time the snake eats a piece of food, it grows longer. The game ends when the snake either runs into the wall (depending on the mode) or collides with its own body. As the snake gets longer, it becomes harder to control, increasing the difficulty of the game.
+Project Structure and Game Logic
+The game is encapsulated in a class called SnakeGame, which contains all components: the game window, snake logic, apple placement, score tracking, rendering, and audio management. The window is initialized at a resolution of 800x600 pixels, with each grid cell being 20x20 pixels, allowing for consistent alignment of the snake and apple on a tile-based grid.
 
- Core Components of the Snake Game
-Game Window:
+The snake is modeled as a vector of SnakeSegment structs. Each segment holds an (x, y) coordinate pair corresponding to its position on the grid. Initially, the snake starts with one segment and grows longer every time it eats an apple. Movement is handled using an enumerated Direction type (UP, DOWN, LEFT, RIGHT) and controlled via keyboard input.
 
-A graphical window where all elements (snake, food, background) are displayed.
+Input and Movement Handling
+User input is captured in the event loop within the run() method using sf::Event. Arrow keys change the snake’s direction, but direct reversal (e.g., going from RIGHT to LEFT instantly) is disallowed to avoid logical errors. Movement is time-controlled using an sf::Clock, which ensures the snake moves only after a specified delay (speed) has passed. This delay shortens each time the snake eats an apple, gradually increasing the game’s difficulty.
 
-Usually built using a library such as SFML, SDL, or Pygame.
+The moveSnake() method handles the snake's logic. Each frame, the body segments follow the head. Depending on the current direction, the head’s position is updated. If the head position matches the apple’s location, a sound is played (eat.wav), the score is increased by 10, the snake grows by one segment, and the apple is randomly repositioned. Additionally, the movement speed is slightly increased (i.e., delay reduced), creating a progressive difficulty curve.
 
-The Snake:
+Apple Placement and Collision Detection
+Apple placement is randomized using the rand() function within the grid’s bounds and visually represented by a red sf::RectangleShape. Collision detection is twofold:
 
-Represented as a series of connected blocks (segments).
+Wall collision: If the snake's head moves beyond the grid limits, the game ends.
 
-Controlled using keyboard inputs (arrow keys or WASD).
+Self-collision: The head’s position is checked against each body segment. If a match is found, the game ends.
 
-The head of the snake determines the direction, and the rest of the body follows.
+Both cases trigger the gameOver() function, which stops the background music and displays a “Game Over” message showing the final score using sf::Text.
 
-Food Item:
+Audio Integration and UI
+Audio is implemented using SFML’s sound classes. A background music track (bg.wav) loops during gameplay using sf::Music, while the apple consumption event triggers a one-time sound effect (eat.wav) using sf::SoundBuffer and sf::Sound.
 
-A small object that appears randomly in the game window.
+The score is dynamically displayed on the screen using a loaded font (arial.ttf) and updated with each apple eaten. The updateScore() function ensures the score label reflects the current score in real time.
 
-When the snake eats it, the food disappears and the snake grows longer.
+Rendering and Game Loop
+The game runs inside the run() method, which includes the main loop. This loop handles events, updates the game state (movement and collision), and calls the draw() function. Inside draw(), the screen is cleared and all visual elements (snake, apple, and score text) are rendered onto the window using SFML’s drawing functions.
 
-A new piece of food is generated at a different location.
+Conclusion
+This project helped me understand core game development principles, such as managing a game loop, real-time input handling, rendering with SFML, sound management, collision detection, and clean code organization through classes and functions. It also strengthened my understanding of C++ STL containers (like vectors), memory-safe graphics handling, and incremental difficulty design. If extended further, I would consider adding pause/resume features, menus, high score saving, and additional game modes for more advanced functionality.
 
-Score System:
-
-The player earns points by eating food.
-
-The score is typically displayed on the screen.
-
-Game Over Conditions:
-
-Collision with the walls (in non-wraparound mode).
-
-Collision with the snake's own body.
-
-Optionally, a game over sound or message is shown.
-
-🧠 Game Logic and Flow
-The game operates on a main game loop, which continuously does the following:
-
-Input Handling: Detects user input (e.g., arrow key presses to change direction).
-
-Game Update: Moves the snake in the chosen direction, checks for collisions and food consumption.
-
-Rendering: Clears the screen and draws the updated state (snake, food, score, etc.).
-
-Delay/Timing: Adds a short delay to control the speed of the game, which can increase over time.
-
-This loop continues until a game-ending condition is met.
-
-🛠️ Technologies Used
-Language: C++, Python, or JavaScript.
-
-Graphics Library:
-
-SFML (Simple and Fast Multimedia Library) for C++.
-
-Pygame for Python.
-
-Canvas API for JavaScript (web-based).
-
-🎯 Skills Learned Through Snake Game Development
-Game Loop Design:
-
-Understanding how real-time updates work.
-
-Event Handling:
-
-Processing keyboard inputs to control the snake’s movement.
-
-Collision Detection:
-
-Checking for overlaps between snake and food or walls.
-
-Randomization:
-
-Generating random coordinates for food appearance.
-
-Graphics and Drawing:
-
-Using a library to draw shapes (rectangles for snake and food).
-
-Modular Code Structure:
-
-Writing functions or classes for snake, food, and game logic.
-
-Problem Solving and Debugging:
-
-Identifying and fixing issues related to movement, collisions, and game logic.
-
-The Snake Game is more than just a simple project; it’s a practical gateway into the world of game development. It teaches you about logic, loops, graphics, and user interaction in a fun and engaging way. By completing this project, you not only create a working game but also build a strong foundation in programming concepts that are applicable in many areas of software development. Whether you're planning to move on to more advanced games or just want to strengthen your coding skills, the Snake Game is a perfect starting point.
+*OUTPUT*:![Image](https://github.com/user-attachments/assets/6fb35a6d-e58e-4450-a16f-a07245bdbe30)
 
 
 
